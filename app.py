@@ -166,7 +166,13 @@ def add_party_traces(fig: go.Figure, df: pd.DataFrame, use_pct: bool = False, ti
     )
 
 
-def render_overview(data: pd.DataFrame, statewide: pd.DataFrame) -> None:
+def get_visible_party_columns(only_major_parties: bool) -> list[str]:
+    if only_major_parties:
+        return ["DEM", "REP", "UNA"]
+    return PARTY_COLUMNS
+
+
+def render_overview(data: pd.DataFrame, statewide: pd.DataFrame, visible_party_columns: list[str]) -> None:
     st.subheader("Statewide Overview")
 
     latest = statewide.iloc[-1]
@@ -175,7 +181,7 @@ def render_overview(data: pd.DataFrame, statewide: pd.DataFrame) -> None:
 
     total_reg = latest["TOTAL"]
     party_total = latest["party_total"]
-    top_party = max(PARTY_COLUMNS, key=lambda c: float(latest.get(c, 0) or 0))
+    top_party = max(visible_party_columns, key=lambda c: float(latest.get(c, 0) or 0))
     top_party_share = latest[f"{top_party}_pct"]
 
     cols = st.columns(4)
@@ -214,7 +220,7 @@ def render_overview(data: pd.DataFrame, statewide: pd.DataFrame) -> None:
 
     st.markdown("### Party composition over time")
     share_fig = go.Figure()
-    for col in PARTY_COLUMNS:
+    for col in visible_party_columns:
         pct_col = f"{col}_pct"
         if pct_col not in statewide.columns:
             continue
@@ -240,13 +246,13 @@ def render_overview(data: pd.DataFrame, statewide: pd.DataFrame) -> None:
     st.plotly_chart(share_fig, use_container_width=True)
 
     st.markdown("### Latest month snapshot")
-    snapshot = statewide.iloc[-1][["TOTAL", "party_total", *PARTY_COLUMNS]].to_frame("value").reset_index()
+    snapshot = statewide.iloc[-1][["TOTAL", "party_total", *visible_party_columns]].to_frame("value").reset_index()
     snapshot.columns = ["metric", "value"]
     snapshot["metric"] = snapshot["metric"].replace({"TOTAL": "TOTAL", "party_total": "Party total"})
     st.dataframe(snapshot, use_container_width=True, hide_index=True)
 
 
-def render_county_explorer(data: pd.DataFrame, county: str) -> None:
+def render_county_explorer(data: pd.DataFrame, county: str, visible_party_columns: list[str]) -> None:
     st.subheader(f"County Explorer: {county}")
     county_df = build_county_summary(data, county)
     if county_df.empty:
@@ -258,7 +264,11 @@ def render_county_explorer(data: pd.DataFrame, county: str) -> None:
 
     cols = st.columns(4)
     cols[0].metric("Latest county total", fmt_int(latest["TOTAL"]), latest["report_date"].strftime("%Y-%m"))
-    cols[1].metric("Largest party", friendly_party_name(max(PARTY_COLUMNS, key=lambda c: float(latest.get(c, 0) or 0))), None)
+    cols[1].metric(
+        "Largest party",
+        friendly_party_name(max(visible_party_columns, key=lambda c: float(latest.get(c, 0) or 0))),
+        None,
+    )
     cols[2].metric("Months available", str(len(county_df)), None)
     cols[3].empty()
 
@@ -269,7 +279,7 @@ def render_county_explorer(data: pd.DataFrame, county: str) -> None:
 
     st.markdown("### Voter counts by month")
     count_fig = go.Figure()
-    for col in PARTY_COLUMNS:
+    for col in visible_party_columns:
         if county_df[col].dropna().empty:
             continue
         # Hide very small parties for clarity, per requirement.
@@ -330,7 +340,7 @@ def render_county_explorer(data: pd.DataFrame, county: str) -> None:
     st.plotly_chart(mom_fig, use_container_width=True)
 
     st.markdown("### County monthly table")
-    display_cols = ["report_date", "TOTAL", *PARTY_COLUMNS]
+    display_cols = ["report_date", "TOTAL", *visible_party_columns]
     display_df = county_df[display_cols].copy()
     display_df["report_date"] = display_df["report_date"].dt.strftime("%Y-%m")
     st.dataframe(display_df, use_container_width=True, hide_index=True)
@@ -350,16 +360,19 @@ def main() -> None:
     with st.sidebar:
         st.header("Navigation")
         page = st.radio("Page", ["Overview", "County Explorer"], index=0)
+        only_major_parties = st.checkbox("Only display DEM/REP/UNA", value=True)
         st.markdown("---")
         st.caption(f"Loaded {len(data):,} county-month rows from {data['report_date'].nunique()} months.")
         st.caption(f"Counties: {data['county'].nunique()}")
 
+    visible_party_columns = get_visible_party_columns(only_major_parties)
+
     if page == "Overview":
-        render_overview(data, statewide)
+        render_overview(data, statewide, visible_party_columns)
     else:
         counties = sorted(data["county"].dropna().unique().tolist())
         county = st.selectbox("Select county", counties, index=0)
-        render_county_explorer(data, county)
+        render_county_explorer(data, county, visible_party_columns)
 
 
 if __name__ == "__main__":
