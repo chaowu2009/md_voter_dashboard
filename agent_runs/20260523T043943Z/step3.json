@@ -1,0 +1,19 @@
+{
+  "step": "step3",
+  "script": "step3_anomaly.py",
+  "status": "success",
+  "started_at": "2026-05-23T04:40:34.638433+00:00",
+  "ended_at": "2026-05-23T04:40:36.436855+00:00",
+  "duration_seconds": 1.798,
+  "return_code": 0,
+  "stdout_tail": [
+    "{",
+    "  \"total_findings\": 311,",
+    "  \"likely_parsing_error\": 90,",
+    "  \"possible_real_change\": 221,",
+    "  \"distinct_report_dates\": 18,",
+    "  \"distinct_counties\": 24",
+    "}"
+  ],
+  "stderr_tail": []
+}

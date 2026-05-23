@@ -1,0 +1,64 @@
+{
+  "run_id": "20260523T052954Z",
+  "started_at": "2026-05-23T05:29:54.785031+00:00",
+  "ended_at": "2026-05-23T05:30:32.708052+00:00",
+  "overall_status": "success",
+  "steps": [
+    {
+      "step": "step1",
+      "script": "step1_parser.py",
+      "status": "success",
+      "duration_seconds": 34.725,
+      "return_code": 0
+    },
+    {
+      "step": "step2",
+      "script": "step2_validate.py",
+      "status": "success",
+      "duration_seconds": 0.797,
+      "return_code": 0
+    },
+    {
+      "step": "step3",
+      "script": "step3_anomaly.py",
+      "status": "success",
+      "duration_seconds": 1.77,
+      "return_code": 0
+    },
+    {
+      "step": "step4",
+      "script": "step4_self_improve.py",
+      "status": "success",
+      "duration_seconds": 0.627,
+      "return_code": 0
+    }
+  ],
+  "artifacts": {
+    "parsed_csv_count": 26,
+    "validation": {
+      "files_validated": 26,
+      "average_parser_quality_score": 99.0,
+      "min_parser_quality_score": 99,
+      "max_parser_quality_score": 99
+    },
+    "anomaly": {
+      "total_findings": 257,
+      "likely_parsing_error": 36,
+      "possible_real_change": 221,
+      "distinct_report_dates": 18,
+      "distinct_counties": 24
+    },
+    "step4": {
+      "suggestions_written": 1,
+      "regression_tests_generated": [
+        "test_required_schema_columns.py"
+      ],
+      "failure_modes_detected": [
+        "other_validation_issue",
+        "parse_extraction_failure",
+        "anomaly_only_drift"
+      ],
+      "before_after_scoring_file": "before_after_scoring.json"
+    }
+  }
+}
