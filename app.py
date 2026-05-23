@@ -184,11 +184,10 @@ def render_overview(data: pd.DataFrame, statewide: pd.DataFrame, visible_party_c
     top_party = max(visible_party_columns, key=lambda c: float(latest.get(c, 0) or 0))
     top_party_share = latest[f"{top_party}_pct"]
 
-    cols = st.columns(4)
+    cols = st.columns(3)
     cols[0].metric("Latest statewide total", fmt_int(total_reg), latest_date)
-    cols[1].metric("Total party registrations", fmt_int(party_total), fmt_pct(latest["party_total_pct"]))
-    cols[2].metric("Top party", friendly_party_name(top_party), fmt_pct(top_party_share))
-    cols[3].metric("Counties covered", str(data["county"].nunique()), None)
+    cols[1].metric("Top party", friendly_party_name(top_party), fmt_pct(top_party_share))
+    cols[2].metric("Counties covered", str(data["county"].nunique()), None)
 
     if prev is not None:
         total_delta = total_reg - prev["TOTAL"]
@@ -246,9 +245,9 @@ def render_overview(data: pd.DataFrame, statewide: pd.DataFrame, visible_party_c
     st.plotly_chart(share_fig, use_container_width=True)
 
     st.markdown("### Latest month snapshot")
-    snapshot = statewide.iloc[-1][["TOTAL", "party_total", *visible_party_columns]].to_frame("value").reset_index()
+    snapshot = statewide.iloc[-1][["TOTAL", *visible_party_columns]].to_frame("value").reset_index()
     snapshot.columns = ["metric", "value"]
-    snapshot["metric"] = snapshot["metric"].replace({"TOTAL": "TOTAL", "party_total": "Party total"})
+    snapshot["metric"] = snapshot["metric"].replace({"TOTAL": "TOTAL"})
     st.dataframe(snapshot, use_container_width=True, hide_index=True)
 
 
