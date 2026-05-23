@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Generated project artifacts
+agent_runs/
+agent_suggestions/
+data/parsed/*.csv
+data/parsed/parse_failures.log
+data/anomaly_reports/*.csv
+data/anomaly_reports/*.json
+data/validation_reports/*.csv
+data/validation_reports/*.json
+
+# Merged output
+merged_all.csv
+data/parsed/merged_all.csv
+
+# Notebook checkpoints
+.ipynb_checkpoints/

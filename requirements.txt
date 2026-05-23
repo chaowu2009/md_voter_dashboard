@@ -1,0 +1,6 @@
+pandas
+plotly
+streamlit
+pdfplumber
+rapidocr-onnxruntime
+numpy

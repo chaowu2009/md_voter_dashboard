@@ -1,0 +1,8 @@
+{
+  "generated_from_suggestions": [
+    "SUG-004"
+  ],
+  "tests": [
+    "test_required_schema_columns.py"
+  ]
+}
